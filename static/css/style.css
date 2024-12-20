@@ -1,0 +1,75 @@
+/* Stile generale */
+body {
+    background-color: #121212;
+    color: #e0e0e0;
+    font-family: Arial, sans-serif;
+    margin: 0;
+}
+
+/* Header della pagina */
+.header {
+    width: 100%;
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 1030;
+    background-color: #343a40;
+}
+
+.header h1 {
+    margin: 0;
+}
+
+.header .form-control {
+    width: auto;
+}
+
+/* Bottoni */
+.btn-group .btn {
+    margin-left: 5px;
+}
+
+/* Spaziatura per evitare sovrapposizione con l'header */
+.mt-5.pt-4 {
+    padding-top: 120px;
+}
+
+/* Contenitore principale */
+.container-fluid {
+    padding: 0; /* Rimuove i padding laterali */
+}
+
+/* Contenitore della tabella */
+.table-responsive {
+    overflow-x: auto;
+}
+
+/* Tabella */
+.table {
+    width: 100%;
+    table-layout: auto; /* Le colonne si adattano al contenuto */
+}
+
+.table th, .table td {
+    text-align: center;
+    vertical-align: middle;
+    min-width: 120px; /* Larghezza minima per ogni colonna */
+}
+
+.table th {
+    text-transform: uppercase;
+    font-weight: bold;
+    white-space: nowrap;
+}
+
+.table-bordered th, .table-bordered td {
+    border: 1px solid #444;
+}
+
+/* Intestazione della tabella sticky */
+.sticky-top {
+    z-index: 1020;
+    background-color: #343a40;
+    color: white;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}

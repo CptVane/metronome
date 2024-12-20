@@ -1,0 +1,83 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container mt-5">
+    <!-- Page Header -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2>Add Work</h2>
+        <a href="{{ url_for('dashboard') }}" class="btn btn-secondary">Back to Dashboard</a>
+    </div>
+
+    <!-- Quick Event Creator -->
+    <div class="bg-secondary text-light p-3 rounded mb-4">
+        <h4>Create or Select Event</h4>
+        <form method="POST" action="{{ url_for('add_work') }}">
+            <div class="row mb-3">
+                <!-- Event Name -->
+                <div class="col-md-4">
+                    <label for="event_name" class="form-label">Event Name</label>
+                    <input type="text" class="form-control" id="event_name" name="event_name" required>
+                </div>
+                <!-- Work ID -->
+                <div class="col-md-4">
+                    <label for="work_id" class="form-label">Work ID</label>
+                    <input type="text" class="form-control" id="work_id" name="work_id" required>
+                </div>
+                <!-- Client Dropdown -->
+                <div class="col-md-4">
+                    <label for="client_id" class="form-label">Client</label>
+                    <select class="form-select" id="client_id" name="client_id" required>
+                        <option value="" disabled selected>Select Client</option>
+                        {% for client in clients %}
+                            <option value="{{ client.id }}">{{ client.name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+            </div>
+            <div class="d-flex justify-content-end">
+                <button type="submit" name="quick_add_event" class="btn btn-success">Save Event</button>
+            </div>
+        </form>
+    </div>
+
+    <!-- Add Work Form -->
+    <form method="POST" action="{{ url_for('add_work') }}" class="bg-dark text-light p-4 rounded">
+        <h4>Work Data</h4>
+        <div class="row mb-3">
+            <!-- Date -->
+            <div class="col-md-6">
+                <label for="date" class="form-label">Date</label>
+                <input type="date" class="form-control" id="date" name="date" required>
+            </div>
+            <!-- Daily Fee -->
+            <div class="col-md-6">
+                <label for="fee" class="form-label">Daily Fee (€)</label>
+                <input type="number" step="0.01" class="form-control" id="fee" name="fee" value="50" required>
+            </div>
+        </div>
+
+        <div class="row mb-3">
+            <!-- Start Time -->
+            <div class="col-md-4">
+                <label for="start_time" class="form-label">Start Time</label>
+                <input type="time" class="form-control" id="start_time" name="start_time" value="09:00" required>
+            </div>
+            <!-- End Time -->
+            <div class="col-md-4">
+                <label for="end_time" class="form-label">End Time</label>
+                <input type="time" class="form-control" id="end_time" name="end_time" value="18:00" required>
+            </div>
+            <!-- Break Time -->
+            <div class="col-md-4">
+                <label for="break_time" class="form-label">Break Time (Minutes)</label>
+                <input type="number" class="form-control" id="break_time" name="break_time" value="60" min="0" required>
+            </div>
+        </div>
+
+        <!-- Submit Button -->
+        <div class="d-flex justify-content-end">
+            <button type="submit" class="btn btn-success">Add Work</button>
+        </div>
+    </form>
+</div>
+{% endblock %}
