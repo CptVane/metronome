@@ -1,0 +1,57 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*.pyo
+
+# C extensions
+*.so
+
+# Virtual environment
+venv/
+env/
+
+# Distribution / packaging
+*.egg
+*.egg-info/
+dist/
+build/
+*.whl
+
+# Flask instance folder
+instance/
+*.sqlite3
+*.db
+
+# Logs and debug files
+*.log
+*.pot
+
+# Unit test / coverage reports
+.coverage
+.tox/
+.nox/
+.cache/
+.pytest_cache/
+
+# Editor and IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+*.sublime-workspace
+*.sublime-project
+
+# Operating system files
+.DS_Store
+Thumbs.db
+
+# Static and media files (if built/generated)
+static/media/
+static/css/*.map
+static/js/*.map
+
+# Node.js (if used for front-end assets)
+node_modules/
+npm-debug.log
+yarn-error.log
