@@ -119,6 +119,42 @@ def workday_row_template():
     return render_template('workday_row.html', next_date=next_date)
 
 
+@app.route('/edit_workday/<int:workday_id>', methods=['GET'])
+def edit_workday(workday_id):
+    workday = Workday.query.get(workday_id)
+    if not workday:
+        return "Workday not found", 404
+    return render_template('edit_workday.html', workday=workday)
+
+@app.route('/duplicate_workday/<int:workday_id>', methods=['POST'])
+def duplicate_workday(workday_id):
+    workday = Workday.query.get(workday_id)
+    if not workday:
+        return "Workday not found", 404
+
+    new_workday = Workday(
+        date=workday.date,
+        work_name=workday.work_name,
+        client_name=workday.client_name,
+        start_time=workday.start_time,
+        end_time=workday.end_time,
+        break_time=workday.break_time,
+        work_time=workday.work_time,
+        total_fee=workday.total_fee
+    )
+    db.session.add(new_workday)
+    db.session.commit()
+    return redirect('/')
+
+@app.route('/delete_workday/<int:workday_id>', methods=['POST'])
+def delete_workday(workday_id):
+    workday = Workday.query.get(workday_id)
+    if not workday:
+        return "Workday not found", 404
+
+    db.session.delete(workday)
+    db.session.commit()
+    return redirect('/')
 
 
 

@@ -19,7 +19,7 @@
 <div class="container-fluid mt-5 pt-5">
     <!-- Workdays Table -->
     <div class="table-responsive mt-3">
-        <table class="table table-dark table-striped table-bordered">
+        <table class="table table-bordered text-white">
             <thead>
                 <tr>
                     <th>Date</th>
@@ -30,23 +30,47 @@
                     <th>Break Time</th>
                     <th>Work Time</th>
                     <th>Total Fee</th>
+                    <th>Actions</th>
                 </tr>
             </thead>
             <tbody>
-                {% for work in workdays %}
+                {% for workday in workdays %}
                 <tr>
-                    <td>{{ work.date }}</td>
-                    <td>{{ work.event.name }}</td>
-                    <td>{{ work.event.client.name }}</td>
-                    <td>{{ work.start_time }}</td>
-                    <td>{{ work.end_time }}</td>
-                    <td>{{ work.break_time }} minutes</td>
-                    <td>{{ work.work_time }} hours</td>
-                    <td>${{ work.total_fee }}</td>
+                    <td>{{ workday.date }}</td>
+                    <td>{{ workday.work_name }}</td>
+                    <td>{{ workday.client_name }}</td>
+                    <td>{{ workday.start_time }}</td>
+                    <td>{{ workday.end_time }}</td>
+                    <td>{{ workday.break_time }}</td>
+                    <td>{{ workday.work_time }}</td>
+                    <td>{{ workday.total_fee }}</td>
+                    <td class="text-center">
+                        <!-- Edit Button -->
+                        <form action="/edit_workday/{{ workday.id }}" method="GET" class="d-inline">
+                            <button type="submit" class="btn btn-link text-primary" title="Edit">
+                                <i class="fas fa-edit"></i>
+                            </button>
+                        </form>
+        
+                        <!-- Duplicate Button -->
+                        <form action="/duplicate_workday/{{ workday.id }}" method="POST" class="d-inline">
+                            <button type="submit" class="btn btn-link text-success" title="Duplicate">
+                                <i class="fas fa-copy"></i>
+                            </button>
+                        </form>
+        
+                        <!-- Erase Button -->
+                        <form action="/delete_workday/{{ workday.id }}" method="POST" class="d-inline">
+                            <button type="submit" class="btn btn-link text-danger" title="Erase">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </form>
+                    </td>
                 </tr>
                 {% endfor %}
             </tbody>
         </table>
+        
     </div>
 </div>
 
