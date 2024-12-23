@@ -2,4 +2,6 @@
 /instance/
 /.vscode/
 /migrations/
+/migrations/versions/
 /__pycache_/
+/.idea/
