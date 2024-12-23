@@ -3,6 +3,12 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
 from datetime import datetime, timedelta
 from flask import request
+import os
+import logging
+
+logging.basicConfig(level=logging.DEBUG)
+
+print(f"Working directory: {os.getcwd()}")
 
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///metronome.db'
@@ -68,18 +74,8 @@ def calculate_total_fee(work_time, base_fee=230):
         extra_hours = work_time - 10
         return base_fee + (25 * extra_hours)
 
-'''
-def calculate_work_time(start_time, end_time, break_time):
-    start_dt = datetime.combine(datetime.today(), start_time)
-    end_dt = datetime.combine(datetime.today(), end_time)
-
-    if end_dt < start_dt:
-        end_dt += timedelta(days=1)
-
-    duration = (end_dt - start_dt).total_seconds() / 3600  # Convert to hours
-    work_time = max(duration - (break_time / 60), 0)
-    return work_time
-'''
+if __name__ == "__main__":
+    app.run(debug=True)
 
 @app.route('/', methods=['GET'])
 def dashboard():
@@ -105,10 +101,19 @@ def dashboard():
         Workday.date >= start_date, Workday.date <= end_date
     ).order_by(Workday.date.asc()).all()
 
-    # Debugging: Print retrieved workdays
-    print("Workdays Retrieved (Ordered by Date):", workdays)
+    # Format work_time for each workday
+    for workday in workdays:
+        hours = int(workday.work_time)
+        minutes = int((workday.work_time - hours) * 60)
+        workday.formatted_work_time = f"{hours:02}:{minutes:02}"
 
-    return render_template('dashboard.html', workdays=workdays, start_date=start_date, end_date=end_date)
+    return render_template(
+        'dashboard.html',
+        workdays=workdays,
+        start_date=start_date,
+        end_date=end_date
+    )
+
 
 
 @app.route('/workday_row_template')

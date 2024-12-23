@@ -45,15 +45,16 @@ body {
 
 /* Tabella */
 .table {
-    width: 100%;
-    table-layout: auto; /* Le colonne si adattano al contenuto */
+    background-color: #121212; /* Sfondo scuro per la tabella */
+    color: #e0e0e0; /* Colore del testo */
+    border-collapse: collapse; /* Rimuove gli spazi tra le celle */
 }
 
-.table th,
-.table td {
-    text-align: center;
-    vertical-align: middle;
-    min-width: 120px; /* Larghezza minima per ogni colonna */
+.table th, .table td {
+    border: 1px solid #444; /* Colore del bordo */
+    background-color: #1e1e1e; /* Sfondo delle celle */
+    color: #e0e0e0; /* Colore del testo */
+    padding: 8px; /* Spaziatura interna */
 }
 
 .table th {
@@ -164,4 +165,26 @@ body {
 
 .table .btn-link.text-danger i {
     color: #dc3545; /* Bootstrap danger */
+}
+
+.color-circle {
+    display: inline-block;
+    width: 10px; /* Dimensione del cerchio */
+    height: 10px;
+    border-radius: 50%; /* Rende l'elemento circolare */
+    margin-right: 4px; /* Spaziatura tra il cerchio e il testo */
+    vertical-align: middle; /* Allinea il cerchio con il testo */
+}
+
+.highlight-row {
+    background-color: #ffcccc !important; /* Forza il colore evidenziato */
+    transition: background-color 0.3s ease; /* Aggiunge una transizione fluida */
+}
+
+.table tr.highlight-row {
+    background-color: #ffcccc !important;
+}
+
+tr.highlight-row {
+    background-color: #ffcccc !important;
 }
