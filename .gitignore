@@ -1,3 +1,4 @@
 ﻿/instance/
 /.vscode/
 /migrations/
+/__pycache__/
