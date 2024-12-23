@@ -5,6 +5,79 @@ body {
     margin: 0;
 }
 
+/* General input and select styling */
+.form-control, .form-select {
+    background-color: #1e1e1e !important; /* Darker grey background */
+    color: white !important; /* White text */
+    border: none !important; /* Remove borders */
+    outline: none !important; /* Remove focus outline */
+    border-radius: 0 !important; /* Remove rounded corners */
+    box-shadow: none !important; /* Remove shadow */
+}
+
+/* Placeholder styling */
+.form-control::placeholder, .form-select::placeholder {
+    color: rgba(255, 255, 255, 0.7) !important; /* White placeholder with transparency */
+}
+
+/* Specific styling for date and time pickers */
+input[type="date"], input[type="time"] {
+    background-color: #1e1e1e !important; /* Darker grey background */
+    color: white !important; /* White text */
+    border: none !important;
+    border-radius: 0 !important;
+    outline: none !important;
+    -webkit-appearance: none; /* Remove browser styling */
+    -moz-appearance: none;
+    appearance: none;
+    padding-right: 2.5rem; /* Add padding for custom icon */
+    position: relative;
+}
+
+/* Adding a custom icon for date and time pickers */
+input[type="date"]::-webkit-calendar-picker-indicator,
+input[type="time"]::-webkit-calendar-picker-indicator {
+    display: block; /* Ensure visibility */
+    background: url('data:image/svg+xml;charset=UTF-8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="white"><path d="M19 4h-1V2h-2v2H8V2H6v2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 16H5V10h14v10zm-7-9h5v5h-5z"/></svg>')
+        no-repeat center center !important;
+    background-size: 1.5rem 1.5rem !important; /* Adjust icon size */
+    cursor: pointer; /* Pointer cursor for usability */
+}
+
+/* Remove default outline for picker icons */
+input[type="date"]:focus::-webkit-calendar-picker-indicator,
+input[type="time"]:focus::-webkit-calendar-picker-indicator {
+    outline: none !important;
+}
+
+/* Dropdown styling (combobox) */
+select.form-select {
+    background-color: #1e1e1e !important; /* Darker grey background */
+    color: white !important; /* White text */
+    -webkit-appearance: none !important;
+    -moz-appearance: none !important;
+    appearance: none !important;
+    padding-right: 2rem; /* Space for dropdown arrow */
+}
+
+/* Dropdown arrow for select */
+select.form-select::-ms-expand {
+    display: none; /* Hide arrow in Microsoft browsers */
+}
+
+/* Ensure the input fields for date and time are styled similarly */
+input[type="date"], input[type="time"], select {
+    text-indent: 0.5rem; /* Adjust text spacing */
+}
+
+/* Optional hover effects for better UX */
+input:hover, select:hover {
+    background-color: #2a2a2a !important; /* Slightly lighter grey on hover */
+    opacity: 0.9; /* Subtle transparency */
+}
+
+
+
 /* Header della pagina */
 .header {
     width: 100%;
