@@ -52,33 +52,63 @@ def create_routes(app):
             return "Invalid date", 400
         return render_template('workday_row.html', next_date=next_date)
 
-
-    @app.route('/edit_workday/<int:workday_id>', methods=['GET'])
+    @app.route('/edit_workday/<int:workday_id>', methods=['GET', 'POST'])
     def edit_workday(workday_id):
-        workday = Workday.query.get(workday_id)
-        if not workday:
-            return "Workday not found", 404
+        workday = Workday.query.get_or_404(workday_id)
+
+        if request.method == 'POST':
+            # Parse date and time fields
+            workday.date = datetime.strptime(request.form['date'], '%Y-%m-%d').date()
+
+            # Handle time fields with seconds
+            start_time = request.form['start_time']
+            end_time = request.form['end_time']
+
+            # Parse time fields
+            workday.start_time = datetime.strptime(start_time,
+                                                   '%H:%M:%S').time() if ':' in start_time else datetime.strptime(
+                start_time, '%H:%M').time()
+            workday.end_time = datetime.strptime(end_time, '%H:%M:%S').time() if ':' in end_time else datetime.strptime(
+                end_time, '%H:%M').time()
+
+            # Parse other fields
+            workday.break_time = int(request.form['break_time'])
+            workday.fee = float(request.form['fee'])
+
+            # Recalculate work_time and total_fee
+            workday.work_time = calculate_work_time(workday.start_time, workday.end_time, workday.break_time)
+            workday.total_fee = calculate_total_fee(workday.work_time, workday.fee)
+
+            # Commit changes
+            db.session.commit()
+
+            return redirect(url_for('dashboard'))
+
+        # Render edit form with current workday data
         return render_template('edit_workday.html', workday=workday)
 
     @app.route('/duplicate_workday/<int:workday_id>', methods=['POST'])
     def duplicate_workday(workday_id):
-        workday = Workday.query.get(workday_id)
-        if not workday:
-            return "Workday not found", 404
+        # Get the existing workday
+        workday = Workday.query.get_or_404(workday_id)
 
+        # Create a new workday with the same data
         new_workday = Workday(
+            event_id=workday.event_id,
             date=workday.date,
-            work_name=workday.work_name,
-            client_name=workday.client_name,
             start_time=workday.start_time,
             end_time=workday.end_time,
             break_time=workday.break_time,
             work_time=workday.work_time,
-            total_fee=workday.total_fee
+            fee=workday.fee,
+            total_fee=workday.total_fee,
         )
+
+        # Add and commit the new workday
         db.session.add(new_workday)
         db.session.commit()
-        return redirect('/')
+
+        return redirect(url_for('dashboard'))
 
     @app.route('/delete_workday/<int:workday_id>', methods=['POST'])
     def delete_workday(workday_id):
@@ -154,3 +184,5 @@ def create_routes(app):
         date_today = datetime.now().strftime('%Y-%m-%d')
         clients = Client.query.all()
         return render_template('add_work.html', clients=clients, date_today=date_today)
+
+
