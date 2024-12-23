@@ -1,7 +1,10 @@
 ﻿.gitignore
 /instance/
 /.vscode/
-/migrations/
+/migrations/*
 /migrations/versions/
 /__pycache_/
 /.idea/
+__pycache__/
+
+*.pyc
