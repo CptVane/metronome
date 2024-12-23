@@ -1,8 +1,10 @@
-﻿from flask import Flask, render_template, request, redirect, url_for
+﻿from flask import Flask, render_template, request, redirect, url_for, Response
 from sqlalchemy.orm import joinedload
 from models import db, Client, Event, Workday
 from helpers import calculate_work_time, calculate_total_fee
 from datetime import datetime
+from openpyxl import Workbook
+from io import BytesIO
 
 
 def create_routes(app):
@@ -185,4 +187,58 @@ def create_routes(app):
         clients = Client.query.all()
         return render_template('add_work.html', clients=clients, date_today=date_today)
 
+    @app.route('/export_dashboard', methods=['GET'])
+    def export_dashboard():
+        # Fetch workdays from the database
+        start_date = request.args.get('start_date')
+        end_date = request.args.get('end_date')
+
+        if not start_date:
+            start_date = datetime(datetime.now().year, datetime.now().month, 1).date()
+        else:
+            start_date = datetime.strptime(start_date, '%Y-%m-%d').date()
+
+        if not end_date:
+            end_date = datetime.now().date()
+        else:
+            end_date = datetime.strptime(end_date, '%Y-%m-%d').date()
+
+        workdays = Workday.query.filter(
+            Workday.date >= start_date, Workday.date <= end_date
+        ).order_by(Workday.date.asc()).all()
+
+        # Create an Excel workbook
+        wb = Workbook()
+        ws = wb.active
+        ws.title = "Workdays"
+
+        # Add header row with DETTAGLIO and DOVUTO
+        ws.append(["DETTAGLIO", "DOVUTO"])
+
+        # Populate the rows with workday data
+        total_fees = 0
+        for workday in workdays:
+            details = f"{workday.date.strftime('%d/%m/%Y')} - {workday.event.work_id} - {workday.event.client.name} - {workday.event.name} - Ore: {int(workday.work_time)}:{int((workday.work_time - int(workday.work_time)) * 60):02}"
+            fee = round(workday.total_fee, 2)
+            total_fees += fee
+            ws.append([details, f"€ {fee:.2f}"])
+
+        # Add an empty row after the last entry
+        ws.append([])
+
+        # Add total row
+        ws.append(["TOTAL", f"€ {total_fees:.2f}"])
+
+        # Save the workbook to a BytesIO stream
+        output = BytesIO()
+        wb.save(output)
+        output.seek(0)
+
+        # Format the filename dynamically
+        filename = f"MetronomeExport_{start_date.strftime('%Y%m%d')}_{end_date.strftime('%Y%m%d')}.xlsx"
+
+        # Send the file as a response
+        response = Response(output, mimetype="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
+        response.headers["Content-Disposition"] = f"attachment; filename={filename}"
+        return response
 
