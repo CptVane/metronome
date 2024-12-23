@@ -1,12 +1,14 @@
 document.addEventListener('DOMContentLoaded', () => {
-    const startDateInput = document.getElementById('start-date');
-    const endDateInput = document.getElementById('end_date');
+    const filterForm = document.getElementById('filter-form');
+    const dateInputs = document.querySelectorAll('#start-date, #end-date');
 
-    const filterForm = document.getElementById('date-filter-form');
-    const applyFilter = () => {
-        filterForm.submit();
-    };
-
-    startDateInput.addEventListener('change', applyFilter);
-    endDateInput.addEventListener('change', applyFilter);
+    // Submit the form only when Enter is pressed
+    dateInputs.forEach(input => {
+        input.addEventListener('keydown', (event) => {
+            if (event.key === 'Enter') {
+                event.preventDefault(); // Prevent default behavior (e.g., changing focus)
+                filterForm.submit();
+            }
+        });
+    });
 });
