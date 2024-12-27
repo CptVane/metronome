@@ -1,51 +1,54 @@
-﻿from flask import Flask, render_template, request, redirect, url_for, Response
+﻿from flask import Flask, render_template, request, redirect, url_for, Response, flash, jsonify
 from sqlalchemy.orm import joinedload
 from models import db, Client, Event, Workday
-from helpers import calculate_work_time, calculate_total_fee
+from helpers import calculate_work_time, calculate_total_fee, reset_database_connection
 from datetime import datetime
 from openpyxl import Workbook
 from io import BytesIO
+import os, json
 
 
 def create_routes(app):
+
     @app.route('/', methods=['GET'])
     def dashboard():
-        from datetime import datetime
+        try:
+            # Logica della dashboard
+            from datetime import datetime
 
-        # Retrieve start_date and end_date from query parameters or use defaults
-        start_date = request.args.get('start_date')
-        end_date = request.args.get('end_date')
+            start_date = request.args.get('start_date')
+            end_date = request.args.get('end_date')
 
-        # Default to the first day of the current month and today if not provided
-        if not start_date:
-            start_date = datetime(datetime.now().year, datetime.now().month, 1).date()
-        else:
-            start_date = datetime.strptime(start_date, '%Y-%m-%d').date()
+            if not start_date:
+                start_date = datetime(datetime.now().year, datetime.now().month, 1).date()
+            else:
+                start_date = datetime.strptime(start_date, '%Y-%m-%d').date()
 
-        if not end_date:
-            end_date = datetime.now().date()
-        else:
-            end_date = datetime.strptime(end_date, '%Y-%m-%d').date()
+            if not end_date:
+                end_date = datetime.now().date()
+            else:
+                end_date = datetime.strptime(end_date, '%Y-%m-%d').date()
 
-        # Query with joinedload to include related 'event' objects
-        workdays = Workday.query.options(joinedload(Workday.event)).filter(
-            Workday.date >= start_date, Workday.date <= end_date
-        ).order_by(Workday.date.asc()).all()
+            workdays = Workday.query.options(joinedload(Workday.event)).filter(
+                Workday.date >= start_date, Workday.date <= end_date
+            ).order_by(Workday.date.asc()).all()
 
-        # Format work_time for each workday
-        for workday in workdays:
-            hours = int(workday.work_time)
-            minutes = int((workday.work_time - hours) * 60)
-            workday.formatted_work_time = f"{hours:02}:{minutes:02}"
+            for workday in workdays:
+                hours = int(workday.work_time)
+                minutes = int((workday.work_time - hours) * 60)
+                workday.formatted_work_time = f"{hours:02}:{minutes:02}"
 
-        return render_template(
-            'dashboard.html',
-            workdays=workdays,
-            start_date=start_date,
-            end_date=end_date
-        )
+            return render_template(
+                'dashboard.html',
+                workdays=workdays,
+                start_date=start_date,
+                end_date=end_date
+            )
 
-
+        except Exception as e:
+            print(f"Error accessing dashboard: {e}")
+            # Redireziona alla pagina delle impostazioni
+            return redirect(url_for('settings'))
 
     @app.route('/workday_row_template')
     def workday_row_template():
@@ -122,11 +125,10 @@ def create_routes(app):
         db.session.commit()
         return redirect('/')
 
-
-
     @app.route('/add_work', methods=['GET', 'POST'])
     def add_work():
         if request.method == 'POST':
+
             try:
                 print("Form Data Received:", request.form)
                 # Extract client information
@@ -187,6 +189,63 @@ def create_routes(app):
         clients = Client.query.all()
         return render_template('add_work.html', clients=clients, date_today=date_today)
 
+    @app.route('/clients')
+    def clients():
+        clients = Client.query.order_by(Client.name.asc()).all()
+        return render_template('clients.html', clients=clients)
+
+    @app.route('/add_client', methods=['GET', 'POST'])
+    def add_client():
+        if request.method == 'POST':
+            name = request.form['name']
+            color = request.form['color']
+            new_client = Client(name=name, color=color)
+            db.session.add(new_client)
+            db.session.commit()
+            flash('Client added successfully!', 'success')
+            return redirect(url_for('clients'))
+        return render_template('add_client.html')  # Crea un form HTML separato se necessario
+
+    @app.route('/save_client', methods=['POST'])
+    def save_client():
+        data = request.get_json()
+        client_id = data.get('id')
+        name = data.get('name')
+        color = data.get('color')
+
+        client = Client.query.get_or_404(client_id)
+        try:
+            client.name = name
+            client.color = color
+            db.session.commit()
+            return jsonify({"success": True})
+        except Exception as e:
+            db.session.rollback()
+            return jsonify({"success": False, "message": str(e)})
+
+    @app.route('/edit_client/<int:client_id>', methods=['GET', 'POST'])
+    def edit_client(client_id):
+        client = Client.query.get_or_404(client_id)
+        if request.method == 'POST':
+            client.name = request.form['name']
+            client.color = request.form['color']
+            db.session.commit()
+            flash('Client updated successfully!', 'success')
+            return redirect(url_for('clients'))
+        return render_template('edit_client.html', client=client)
+
+    @app.route('/delete_client', methods=['DELETE'])
+    def delete_client():
+        client_id = request.args.get('client_id', type=int)
+        client = Client.query.get_or_404(client_id)
+        try:
+            db.session.delete(client)
+            db.session.commit()
+            return jsonify({"success": True})
+        except Exception as e:
+            db.session.rollback()
+            return jsonify({"success": False, "message": str(e)})
+
     @app.route('/export_dashboard', methods=['GET'])
     def export_dashboard():
         # Fetch workdays from the database
@@ -241,4 +300,70 @@ def create_routes(app):
         response = Response(output, mimetype="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
         response.headers["Content-Disposition"] = f"attachment; filename={filename}"
         return response
+
+    settings_file = 'settings.json'
+
+    @app.route('/settings', methods=['GET', 'POST'])
+    def settings():
+        global emergency_mode
+        if request.method == 'POST':
+            # Raccogli i dati dal form
+            db_type = request.form.get('db_type', 'sqlite')
+            sqlite_path = request.form.get('sqlite_path', 'metronome.db')
+            pg_username = request.form.get('pg_username', '')
+            pg_password = request.form.get('pg_password', '')
+            pg_host = request.form.get('pg_host', 'localhost')
+            pg_port = request.form.get('pg_port', '5432')
+            pg_database = request.form.get('pg_database', '')
+
+            username = request.form.get('username', 'Admin')
+            password = request.form.get('password', '')
+            name = request.form.get('name', '')
+            lastname = request.form.get('lastname', '')
+            email = request.form.get('email', '')
+            phone = request.form.get('phone', '')
+            base_fee = float(request.form.get('base_fee', 230.0))
+
+            # Salva le impostazioni nel file JSON
+            config = {
+                "db_type": db_type,
+                "sqlite_path": sqlite_path,
+                "postgresql": {
+                    "username": pg_username,
+                    "password": pg_password,
+                    "host": pg_host,
+                    "port": pg_port,
+                    "database": pg_database
+                },
+                "username": username,
+                "password": password,
+                "name": name,
+                "lastname": lastname,
+                "email": email,
+                "phone": phone,
+                "base_fee": base_fee
+            }
+
+            try:
+                with open(settings_file, 'w') as f:
+                    json.dump(config, f, indent=4)
+
+                with app.app_context():
+                    reset_database_connection(app, db, config)
+                    emergency_mode = False  # Disabilita modalità d'emergenza
+                    flash("Settings saved and database connection updated.", "success")
+                    return redirect(url_for('dashboard'))
+            except RuntimeError as e:
+                emergency_mode = True  # Rimane in modalità d'emergenza
+                flash(f"Error updating settings: {e}", "danger")
+                return redirect(url_for('settings'))
+
+        # Carica le impostazioni esistenti
+        current_settings = {}
+        if os.path.exists(settings_file):
+            with open(settings_file) as f:
+                current_settings = json.load(f)
+
+        return render_template('settings.html', settings=current_settings)
+
 

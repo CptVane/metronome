@@ -1,0 +1,18 @@
+{
+    "db_type": "postgresql",
+    "sqlite_path": "metronome.db",
+    "postgresql": {
+        "username": "postgres",
+        "password": "c7480",
+        "host": "localhost",
+        "port": "5432",
+        "database": "metronome"
+    },
+    "username": "Admin",
+    "password": "c7480",
+    "name": "Mattias",
+    "lastname": "Caserini",
+    "email": "tia.vivi@gmail.com",
+    "phone": "3392061213",
+    "base_fee": 230.0
+}

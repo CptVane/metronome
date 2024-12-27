@@ -1,0 +1,9 @@
+﻿<div class="header bg-dark text-white p-3 d-flex justify-content-between align-items-center position-fixed w-100 shadow">
+    <h1 class="m-0">Add Work</h1>
+    <div class="d-flex align-items-center gap-2">
+        <a href="{{ url_for('dashboard') }}" class="btn btn-secondary">Dashboard</a>
+        <a href="#" id="add-workday-btn" class="btn btn-primary">+ Add Another Workday</a>
+        <a href="#" id="save-work-btn" class="btn btn-success" onclick="submitAddWorkForm()" disabled>Save Work</a>
+        <a href="{{ url_for('settings') }}" class="btn btn-warning">Settings</a>
+    </div>
+</div>

@@ -1,23 +1,20 @@
 {% extends 'base.html' %}
 
 {% block content %}
-<div class="container mt-5 text-white">
-    <h2>Add Work</h2>
+{% include 'add_work_header.html' %}
+<div class="container pt-5 mt-5">
     <form id="add-work-form" method="POST" action="/add_work">
         <!-- New Event Section -->
-       <div class="row mt-4">
-            <!-- Work ID Field (1/5 width) -->
+        <div class="row mt-4">
             <div class="col-2">
                 <label for="work-id">Work ID</label>
                 <input type="text" id="work-id" name="work_id" class="form-control bg-dark text-white" placeholder="Enter Work ID">
             </div>
-            <!-- Event Name Field (4/5 width) -->
             <div class="col-10">
                 <label for="event-name">Event Name</label>
                 <input type="text" id="event-name" name="event_name" class="form-control bg-dark text-white" placeholder="Enter Event Name">
             </div>
         </div>
-
 
         <!-- Client Section -->
         <div id="existing-client-section" class="form-group mt-3">
@@ -41,13 +38,7 @@
 
         <!-- Workdays Section -->
         <div id="workdays-section" class="mt-5">
-            <!-- Flex container for header and button -->
-            <div class="d-flex justify-content-between align-items-center">
-                <h4>Add Workdays</h4>
-                <button type="button" id="add-workday-btn" class="btn btn-secondary">+ Add Another Workday</button>
-            </div>
-
-            <!-- Header Row -->
+            <h4>Add Workdays</h4>
             <div class="workday-header-row sticky-top mt-3">
                 <label>Date</label>
                 <label>Start Time</label>
@@ -56,19 +47,13 @@
                 <label>Daily Fee</label>
                 <label>Actions</label>
             </div>
-
-            <!-- Workdays Container -->
             <div id="workdays-container">
                 <!-- Default Row -->
             </div>
         </div>
-
-
-        <!-- Submit Button -->
-        <button type="submit" class="btn btn-primary mt-4">Save Work</button>
     </form>
 </div>
-
 <script src="{{ url_for('static', filename='js/add_client.js') }}"></script>
 <script src="{{ url_for('static', filename='js/add_workday.js') }}"></script>
+<script src="{{ url_for('static', filename='js/validation.js') }}"></script>
 {% endblock %}

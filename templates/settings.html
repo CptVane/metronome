@@ -1,0 +1,95 @@
+﻿{% extends 'base.html' %}
+
+{% block content %}
+{% include 'settings_header.html' %}
+
+<div class="container pt-5 mt-5">
+    <form method="POST" action="{{ url_for('settings') }}">
+        <!-- Database Type -->
+        <div class="form-group mt-3">
+            <label for="db_type">Database Type</label>
+            <select id="db_type" name="db_type" class="form-control bg-dark text-white" required>
+                <option value="sqlite" {% if settings.db_type == 'sqlite' %}selected{% endif %}>SQLite</option>
+                <option value="postgresql" {% if settings.db_type == 'postgresql' %}selected{% endif %}>PostgreSQL</option>
+            </select>
+        </div>
+
+        <!-- SQLite Fields -->
+        <div id="sqlite-fields" class="form-group mt-3" style="display: {% if settings.db_type == 'sqlite' %}block{% else %}none{% endif %};">
+            <label for="sqlite_path">SQLite Path</label>
+            <input type="text" id="sqlite_path" name="sqlite_path" class="form-control bg-dark text-white" value="{{ settings.sqlite_path }}">
+        </div>
+
+        <!-- PostgreSQL Fields -->
+        <div id="postgres-fields" class="mt-3" style="display: {% if settings.db_type == 'postgresql' %}block{% else %}none{% endif %};">
+            <div class="form-group">
+                <label for="pg_username">PostgreSQL Username</label>
+                <input type="text" id="pg_username" name="pg_username" class="form-control bg-dark text-white" value="{{ settings.postgresql.username }}">
+            </div>
+            <div class="form-group mt-3">
+                <label for="pg_password">PostgreSQL Password</label>
+                <input type="password" id="pg_password" name="pg_password" class="form-control bg-dark text-white" value="{{ settings.postgresql.password }}">
+            </div>
+            <div class="form-group mt-3">
+                <label for="pg_host">PostgreSQL Host</label>
+                <input type="text" id="pg_host" name="pg_host" class="form-control bg-dark text-white" value="{{ settings.postgresql.host }}">
+            </div>
+            <div class="form-group mt-3">
+                <label for="pg_port">PostgreSQL Port</label>
+                <input type="text" id="pg_port" name="pg_port" class="form-control bg-dark text-white" value="{{ settings.postgresql.port }}">
+            </div>
+            <div class="form-group mt-3">
+                <label for="pg_database">PostgreSQL Database Name</label>
+                <input type="text" id="pg_database" name="pg_database" class="form-control bg-dark text-white" value="{{ settings.postgresql.database }}">
+            </div>
+        </div>
+
+        <!-- User Settings -->
+        <h5 class="mt-4">User Settings</h5>
+        <div class="form-group mt-3">
+            <label for="username">Username</label>
+            <input type="text" id="username" name="username" class="form-control bg-dark text-white" value="{{ settings.username }}" required>
+        </div>
+        <div class="form-group mt-3">
+            <label for="password">Password</label>
+            <input type="password" id="password" name="password" class="form-control bg-dark text-white" value="{{ settings.password }}">
+        </div>
+        <div class="form-group mt-3">
+            <label for="name">First Name</label>
+            <input type="text" id="name" name="name" class="form-control bg-dark text-white" value="{{ settings.name }}">
+        </div>
+        <div class="form-group mt-3">
+            <label for="lastname">Last Name</label>
+            <input type="text" id="lastname" name="lastname" class="form-control bg-dark text-white" value="{{ settings.lastname }}">
+        </div>
+        <div class="form-group mt-3">
+            <label for="email">Email</label>
+            <input type="email" id="email" name="email" class="form-control bg-dark text-white" value="{{ settings.email }}">
+        </div>
+        <div class="form-group mt-3">
+            <label for="phone">Phone</label>
+            <input type="text" id="phone" name="phone" class="form-control bg-dark text-white" value="{{ settings.phone }}">
+        </div>
+        <div class="form-group mt-3">
+            <label for="base_fee">Base Fee</label>
+            <input type="number" id="base_fee" name="base_fee" class="form-control bg-dark text-white" value="{{ settings.base_fee }}">
+        </div>
+
+        <!-- Save Button
+        <button type="submit" class="btn btn-success mt-4">Save Settings</button>-->
+    </form>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const dbTypeSelect = document.getElementById('db_type');
+        const sqliteFields = document.getElementById('sqlite-fields');
+        const postgresFields = document.getElementById('postgres-fields');
+
+        dbTypeSelect.addEventListener('change', () => {
+            sqliteFields.style.display = dbTypeSelect.value === 'sqlite' ? 'block' : 'none';
+            postgresFields.style.display = dbTypeSelect.value === 'postgresql' ? 'block' : 'none';
+        });
+    });
+</script>
+{% endblock %}

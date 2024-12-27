@@ -1,15 +1,22 @@
-﻿<div class="header bg-dark text-white p-3 d-flex justify-content-between align-items-center w-100" style="position: fixed; top: 0; left: 0; z-index: 1030;">
+﻿<div class="header bg-dark text-white p-3 d-flex justify-content-between align-items-center position-fixed w-100 shadow">
     <h1 class="m-0">Dashboard</h1>
     <div class="d-flex justify-content-center align-items-center gap-3 w-50">
-        <!-- Filter Section -->
         <form id="filter-form" method="get" action="/" class="d-flex align-items-center gap-2 m-0">
             <input type="date" id="start-date" name="start_date" class="form-control bg-dark text-white" value="{{ start_date }}">
             <input type="date" id="end-date" name="end_date" class="form-control bg-dark text-white" value="{{ end_date }}">
         </form>
     </div>
-    <!-- Add Work and Export Buttons -->
-    <div>
-        <a href="/export_dashboard?start_date={{ start_date }}&end_date={{ end_date }}" class="btn btn-success">Export to Excel</a>
+    <div class="d-flex align-items-center gap-2">
         <a href="{{ url_for('add_work') }}" class="btn btn-primary">+ Add Work</a>
+        <div class="dropdown">
+            <button class="btn btn-info dropdown-toggle" type="button" id="toolsDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                Tools
+            </button>
+            <ul class="dropdown-menu" aria-labelledby="toolsDropdown">
+                <li><a class="dropdown-item" href="{{ url_for('clients') }}">Manage Clients</a></li>
+                <li><a class="dropdown-item" href="/export_dashboard?start_date={{ start_date }}&end_date={{ end_date }}">Export to Excel</a></li>
+            </ul>
+        </div>
+        <a href="{{ url_for('settings') }}" class="btn btn-warning">Settings</a>
     </div>
 </div>
