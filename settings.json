@@ -3,14 +3,14 @@
     "sqlite_path": "metronome.db",
     "postgresql": {
         "username": "postgres",
-        "password": "c7480",
-        "host": "localhost",
+        "password": "KOgbbuRddMcdkJBueMZFtyIujOBZZSks",
+        "host": "postgres.railway.internal",
         "port": "5432",
-        "database": "metronome"
+        "database": "railway"
     },
     "username": "Admin",
     "password": "c7480",
-    "name": "Mattias",
+    "name": "Mattia",
     "lastname": "Caserini",
     "email": "tia.vivi@gmail.com",
     "phone": "3392061213",
