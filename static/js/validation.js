@@ -1,4 +1,26 @@
 ﻿function submitAddWorkForm() {
+    const workIdInput = document.getElementById('work-id');
+    const workNameInput = document.getElementById('event-name');
+    const clientSelect = document.getElementById('client-selection');
+    const newClientNameInput = document.getElementById('new-client-name');
+    const newClientSection = document.getElementById('new-client-section');
+
+    const workId = workIdInput.value.trim();
+    const workName = workNameInput.value.trim();
+    const clientSelected = clientSelect.value !== "" && clientSelect.value !== null;
+    const newClientName = newClientNameInput.value.trim();
+
+    // Controllo di validazione
+    const isValid = workId !== "" &&
+                    workName !== "" &&
+                    (clientSelected || (newClientSection.style.display === 'block' && newClientName !== ""));
+
+    if (!isValid) {
+        alert("Please fill out all required fields before saving.");
+        return; // Interrompe l'invio del modulo
+    }
+
+    // Invia il modulo se tutti i campi sono validi
     const form = document.getElementById('add-work-form');
     if (form) {
         console.log("Submitting form...");
