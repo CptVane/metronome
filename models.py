@@ -1,4 +1,5 @@
 ﻿from flask_sqlalchemy import SQLAlchemy
+from sqlalchemy.dialects.postgresql import JSON
 
 db = SQLAlchemy()
 
@@ -42,4 +43,7 @@ class Workday(db.Model):
     fee = db.Column(db.Float, nullable=False)  # Daily Fee
     total_fee = db.Column(db.Float, nullable=False)  # Total Fee (work_time * fee)
     
-
+    use_overriden_fee = db.Column(db.Boolean, nullable=False, default=False)  # Usa Tariffa Manuale
+    override_fee = db.Column(db.Float, nullable=False, default=0.0)  # Tariffa Manuale
+    highlighted = db.Column(db.Boolean, nullable=False, default=False)  # Evidenziato
+    tags = db.Column(JSON, nullable=True)

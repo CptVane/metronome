@@ -1,7 +1,7 @@
 ﻿from flask import Flask, render_template, request, redirect, url_for, Response, flash, jsonify
 from sqlalchemy.orm import joinedload
 from models import db, Client, Event, Workday
-from helpers import calculate_work_time, calculate_total_fee, reset_database_connection
+from helpers import calculate_work_time, calculate_total_fee
 from datetime import datetime
 from openpyxl import Workbook
 from io import BytesIO
@@ -9,7 +9,6 @@ import os, json
 
 
 def create_routes(app):
-
     @app.route('/', methods=['GET'])
     def dashboard():
         try:
@@ -29,15 +28,18 @@ def create_routes(app):
             else:
                 end_date = datetime.strptime(end_date, '%Y-%m-%d').date()
 
+            # Esegui la query al database
             workdays = Workday.query.options(joinedload(Workday.event)).filter(
                 Workday.date >= start_date, Workday.date <= end_date
             ).order_by(Workday.date.asc()).all()
 
+            # Formatta il tempo lavorativo
             for workday in workdays:
                 hours = int(workday.work_time)
                 minutes = int((workday.work_time - hours) * 60)
                 workday.formatted_work_time = f"{hours:02}:{minutes:02}"
 
+            # Ritorna la dashboard
             return render_template(
                 'dashboard.html',
                 workdays=workdays,
@@ -47,7 +49,8 @@ def create_routes(app):
 
         except Exception as e:
             print(f"Error accessing dashboard: {e}")
-            # Redireziona alla pagina delle impostazioni
+            # Redireziona alla pagina delle impostazioni in caso di errore
+            flash("Errore durante il caricamento della dashboard. Controlla le impostazioni.", "danger")
             return redirect(url_for('settings'))
 
     @app.route('/workday_row_template')
@@ -305,7 +308,6 @@ def create_routes(app):
 
     @app.route('/settings', methods=['GET', 'POST'])
     def settings():
-        global emergency_mode
         if request.method == 'POST':
             # Raccogli i dati dal form
             db_type = request.form.get('db_type', 'sqlite')
@@ -348,14 +350,10 @@ def create_routes(app):
                 with open(settings_file, 'w') as f:
                     json.dump(config, f, indent=4)
 
-                with app.app_context():
-                    reset_database_connection(app, db, config)
-                    emergency_mode = False  # Disabilita modalità d'emergenza
-                    flash("Settings saved and database connection updated.", "success")
-                    return redirect(url_for('dashboard'))
-            except RuntimeError as e:
-                emergency_mode = True  # Rimane in modalità d'emergenza
-                flash(f"Error updating settings: {e}", "danger")
+                flash("Settings saved successfully.", "success")
+                return redirect(url_for('dashboard'))
+            except Exception as e:
+                flash(f"Error saving settings: {e}", "danger")
                 return redirect(url_for('settings'))
 
         # Carica le impostazioni esistenti

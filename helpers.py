@@ -27,10 +27,11 @@ def calculate_total_fee(work_time, base_fee=230):
         extra_hours = work_time - 10
         return base_fee + (25 * extra_hours)
 
+"""
 def reset_database_connection(app, db, config):
-    """
-    Reinizializza la connessione al database con il contesto applicativo corretto.
-    """
+    
+    #Reinizializza la connessione al database con il contesto applicativo corretto.
+  
     db_type = config.get("db_type", "sqlite")
 
     # Usa app.instance_path per calcolare il percorso assoluto del database
@@ -77,12 +78,13 @@ def reset_database_connection(app, db, config):
 
 
 def verify_essential_tables(app, db):
-    """
-    Verifica che le tabelle essenziali siano presenti nel database.
-    """
+
+    #Verifica che le tabelle essenziali siano presenti nel database.
+
     with app.app_context():
         inspector = inspect(db.engine)  # Utilizza il motore configurato
         tables = inspector.get_table_names()
         if 'workday' not in tables:
             raise RuntimeError("Tabella 'workday' non trovata. Database non valido.")
         print(f"Tabelle presenti nel database: {tables}")
+"""
