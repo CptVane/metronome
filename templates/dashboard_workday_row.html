@@ -1,4 +1,4 @@
-﻿<tr id="row-{{ workday.id }}">
+﻿<tr id="row-{{ workday.id }}" class="{% if workday.highlighted %}highlighted-row{% endif %}">
     <td>{{ workday.date.strftime('%d/%m/%Y') }}</td>
     <td>{{ workday.event.name }}</td>
     <td>
@@ -25,6 +25,15 @@
             </button>
         </form>
 
+        <!-- Highlight/Unhighlight Button -->
+        <form action="/toggle_highlight/{{ workday.id }}" method="POST" class="d-inline">
+           {% set icon_class = 'fas fa-star' if workday.highlighted else 'far fa-star' %}
+            <button type="submit" class="btn btn-link" title="{% if workday.highlighted %}Unhighlight{% else %}Highlight{% endif %}">
+                <i class="{{ icon_class }}"></i>
+            </button>
+
+        </form>
+
         <!-- Erase Button -->
         <button
             type="button"
@@ -38,4 +47,5 @@
         </button>
         <form id="form-delete-{{ workday.id }}" action="/delete_workday/{{ workday.id }}" method="POST" class="d-none"></form>
     </td>
+
 </tr>

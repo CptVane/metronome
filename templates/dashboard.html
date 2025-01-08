@@ -5,30 +5,28 @@
 {% include 'dashboard_header.html' %}
 
 <!-- Main Content -->
-<div class="container pt-5 mt-5">
-    <!-- Workdays Table -->
-    <div class="table-responsive">
-        <table class="table table-bordered text-white">
-            <thead>
-                <tr>
-                    <th>Date</th>
-                    <th>Work Name</th>
-                    <th>Client Name</th>
-                    <th>Start Time</th>
-                    <th>End Time</th>
-                    <th>Break Time</th>
-                    <th>Work Time</th>
-                    <th>Total Fee</th>
-                    <th>Actions</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for workday in workdays %}
-                    {% include 'dashboard_workday_row.html' %}
-                {% endfor %}
-            </tbody>
-        </table>
-    </div>
+<div class="container-dashboard pt-5 mt-5">
+    <h2 class="text-center text-white">Workday Entries</h2>
+    <ul class="responsive-table">
+        <!-- Table Header -->
+        <li class="table-header d-flex">
+            <div class="col text-uppercase">Date</div>
+            <div class="col text-uppercase">Work ID</div>
+            <div class="col text-uppercase">Work Name</div>
+            <div class="col text-uppercase">Client Name</div>
+            <div class="col text-uppercase">Start Time</div>
+            <div class="col text-uppercase">End Time</div>
+            <div class="col text-uppercase">Break Time</div>
+            <div class="col text-uppercase">Work Time</div>
+            <div class="col text-uppercase">Total Fee</div>
+            <div class="col text-uppercase">Actions</div>
+        </li>
+
+        <!-- Workday Entries -->
+        {% for workday in workdays %}
+            {% include 'dashboard_workday_entry.html' %}
+        {% endfor %}
+    </ul>
 </div>
 
 <script src="{{ url_for('static', filename='js/delete_confirm_highlight.js') }}"></script>

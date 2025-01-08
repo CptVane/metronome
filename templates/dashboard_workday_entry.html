@@ -1,0 +1,42 @@
+﻿<li class="table-row d-flex {% if workday.highlighted %}highlighted-row{% endif %}">
+    <div class="col" data-label="Date">{{ workday.date.strftime('%d/%m/%Y') }}</div>
+    <div class="col" data-label="Work ID">{{ workday.event.work_id }}</div>
+    <div class="col" data-label="Work Name">{{ workday.event.name }}</div>
+    <div class="col" data-label="Client Name">
+        <span class="color-circle" style="background-color: {{ workday.event.client.color }};"></span>
+        {{ workday.event.client.name }}
+    </div>
+    <div class="col" data-label="Start Time">{{ workday.start_time.strftime('%H:%M') }}</div>
+    <div class="col" data-label="End Time">{{ workday.end_time.strftime('%H:%M') }}</div>
+    <div class="col" data-label="Break Time">{{ workday.break_time }}</div>
+    <div class="col" data-label="Work Time">{{ workday.formatted_work_time }}</div>
+    <div class="col" data-label="Total Fee">€ {{ '%.2f' % workday.total_fee }}</div>
+    <div class="col" data-label="Actions">
+        <!-- Edit Button -->
+        <form action="/edit_workday/{{ workday.id }}" method="GET" class="d-inline">
+            <button type="submit" class="btn btn-link text-primary" title="Edit">
+                <i class="fas fa-edit"></i>
+            </button>
+        </form>
+        <!-- Duplicate Button -->
+        <form action="/duplicate_workday/{{ workday.id }}" method="POST" class="d-inline">
+            <button type="submit" class="btn btn-link text-success" title="Duplicate">
+                <i class="fas fa-copy"></i>
+            </button>
+        </form>
+        <!-- Highlight Button -->
+        <form action="/toggle_highlight/{{ workday.id }}" method="POST" class="d-inline">
+            {% set icon_class = 'fas fa-star' if workday.highlighted else 'far fa-star' %}
+            <button type="submit" class="btn btn-link" title="{% if workday.highlighted %}Unhighlight{% else %}Highlight{% endif %}">
+                <i class="{{ icon_class }}"></i>
+            </button>
+        </form>
+        <!-- Delete Button -->
+        <button type="button" class="btn btn-link text-danger delete-button" title="Erase"
+            data-workid="{{ workday.event.work_id }}" data-date="{{ workday.date.strftime('%d/%m/%Y') }}"
+            data-row-id="row-{{ workday.id }}" data-form-id="form-delete-{{ workday.id }}">
+            <i class="fas fa-trash"></i>
+        </button>
+        <form id="form-delete-{{ workday.id }}" action="/delete_workday/{{ workday.id }}" method="POST" class="d-none"></form>
+    </div>
+</li>

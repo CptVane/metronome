@@ -304,6 +304,17 @@ def create_routes(app):
         response.headers["Content-Disposition"] = f"attachment; filename={filename}"
         return response
 
+    @app.route('/toggle_highlight/<int:workday_id>', methods=['POST'])
+    def toggle_highlight(workday_id):
+        workday = Workday.query.get_or_404(workday_id)
+
+        # Cambia lo stato di evidenziazione
+        workday.highlighted = not workday.highlighted
+        db.session.commit()
+
+        flash(f"{'Highlighted' if workday.highlighted else 'Unhighlighted'} workday {workday.id}.", "success")
+        return redirect(url_for('dashboard'))
+
     settings_file = 'settings.json'
 
     @app.route('/settings', methods=['GET', 'POST'])
