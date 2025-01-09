@@ -3,15 +3,15 @@ import json
 from flask import Flask, redirect, url_for, flash, request
 from routes import create_routes
 from models import db
+from flask_migrate import Migrate
 
 # Initialize Flask app
 app = Flask(__name__)
 app.secret_key = "your_super_secret_key_here"
 
-from flask_migrate import Migrate
 migrate = Migrate(app, db)
 
-# Impostazioni predefinite
+# Default settings
 default_settings = {
     "db_type": "sqlite",
     "sqlite_path": "metronome.db",
@@ -40,27 +40,31 @@ with open(settings_file) as f:
     settings = json.load(f)
 
 # Configurazione del database
-db_type = settings.get("db_type", "sqlite")
-if db_type == "sqlite":
-    sqlite_path = settings.get("sqlite_path", "metronome.db")
-    database_uri = f"sqlite:///{sqlite_path}"
-elif db_type == "postgresql":
-    pg_config = settings.get("postgresql", {})
-    database_uri = (
-        f"postgresql://{pg_config.get('username')}:{pg_config.get('password')}@"
-        f"{pg_config.get('host')}:{pg_config.get('port')}/{pg_config.get('database')}"
-    )
-else:
-    raise ValueError(f"Tipo di database '{db_type}' non supportato.")
+# Check for the POSTGRES_URI environment variable first
+database_uri = os.getenv('POSTGRES_URI')
+
+if not database_uri:
+    db_type = settings.get("db_type", "sqlite")
+    if db_type == "sqlite":
+        sqlite_path = settings.get("sqlite_path", "metronome.db")
+        database_uri = f"sqlite:///{sqlite_path}"
+    elif db_type == "postgresql":
+        pg_config = settings.get("postgresql", {})
+        database_uri = (
+            f"postgresql://{pg_config.get('username')}:{pg_config.get('password')}@"
+            f"{pg_config.get('host')}:{pg_config.get('port')}/{pg_config.get('database')}"
+        )
+    else:
+        raise ValueError(f"Tipo di database '{db_type}' non supportato.")
 
 app.config['SQLALCHEMY_DATABASE_URI'] = database_uri
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
-# Inizializzazione di SQLAlchemy
+# Initialize SQLAlchemy
 db.init_app(app)
 print(f"Connesso al database: {database_uri}")
 
-# Registra le rotte
+# Register routes
 create_routes(app)
 
 if __name__ == "__main__":
