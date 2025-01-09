@@ -16,21 +16,6 @@ class Event(db.Model):
     client_id = db.Column(db.Integer, db.ForeignKey('client.id'), nullable=False)
     client = db.relationship('Client', backref=db.backref('events', lazy=True))
 
-'''
-class Work(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    event_id = db.Column(db.Integer, db.ForeignKey('event.id'), nullable=False)
-    event = db.relationship('Event', backref=db.backref('works', lazy=True))
-    date = db.Column(db.Date, nullable=False)
-    start_time = db.Column(db.Time, nullable=False)
-    end_time = db.Column(db.Time, nullable=False)
-    break_time = db.Column(db.Integer, default=0)  # Break time in minutes
-    work_time = db.Column(db.Float, nullable=False)  # Work time in hours
-    fee = db.Column(db.Float, nullable=False)
-    total_fee = db.Column(db.Float, nullable=False)
-    
-'''
-
 class Workday(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     event_id = db.Column(db.Integer, db.ForeignKey('event.id'), nullable=False)  # Linked to Event

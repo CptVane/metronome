@@ -1,9 +1,7 @@
 import os
 import json
 from flask import Flask, redirect, url_for, flash, request
-#from flask_sqlalchemy import SQLAlchemy
 from routes import create_routes
-#from helpers import reset_database_connection
 from models import db
 
 # Initialize Flask app
@@ -34,7 +32,7 @@ default_settings = {
 }
 
 settings_file = 'settings.json'
-#emergency_mode = True
+
 if not os.path.exists(settings_file):
     raise FileNotFoundError(f"Il file {settings_file} non esiste. Crealo prima di avviare l'app.")
 

@@ -9,6 +9,9 @@ import os, json
 
 
 def create_routes(app):
+
+    settings_file = 'settings.json'
+
     @app.route('/', methods=['GET'])
     def dashboard():
         try:
@@ -314,8 +317,6 @@ def create_routes(app):
 
         flash(f"{'Highlighted' if workday.highlighted else 'Unhighlighted'} workday {workday.id}.", "success")
         return redirect(url_for('dashboard'))
-
-    settings_file = 'settings.json'
 
     @app.route('/settings', methods=['GET', 'POST'])
     def settings():

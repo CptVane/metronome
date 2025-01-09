@@ -116,6 +116,15 @@ input:hover, select:hover {
     overflow-x: auto;
 }
 
+.color-circle {
+    display: inline-block;
+    width: 10px; /* Dimensione del cerchio */
+    height: 10px;
+    border-radius: 50%; /* Rende l'elemento circolare */
+    margin-right: 4px; /* Spaziatura tra il cerchio e il testo */
+    vertical-align: middle; /* Allinea il cerchio con il testo */
+}
+
 /* Tabella */
 .table {
     background-color: #121212; /* Sfondo scuro per la tabella */
@@ -139,6 +148,45 @@ input:hover, select:hover {
 .table-bordered th,
 .table-bordered td {
     border: 1px solid #444;
+}
+
+
+.table .btn-link i {
+    vertical-align: middle;
+}
+
+.table .btn-link.text-primary i {
+    color: #007bff; /* Bootstrap primary */
+}
+
+.table .btn-link.text-success i {
+    color: #28a745; /* Bootstrap success */
+}
+
+.table .btn-link.text-danger i {
+    color: #dc3545; /* Bootstrap danger */
+}
+
+.table .btn-link {
+    padding: 0;
+    margin: 0 5px; /* Small spacing between buttons */
+    font-size: 18px; /* Icon size */
+    border: none;
+    background: none;
+    cursor: pointer;
+}
+
+.table tr.highlight-row {
+    background-color: #ffcccc !important;
+}
+
+.table .highlighted-row {
+    --bs-table-bg: #fff3cd !important; /* Forza il colore di sfondo */
+    --bs-table-color: #000 !important; /* Forza il colore del testo */
+    background-color: #fff3cd !important; /* Colore di sfondo giallo chiaro */
+    color: #000 !important; /* Colore del testo nero */
+    border: 2px solid red; /* Debug */
+    transition: background-color 0.3s ease; /* Transizione per evidenziazione */
 }
 
 /* Intestazione della tabella sticky */
@@ -213,53 +261,6 @@ input:hover, select:hover {
     font-size: 18px;
     color: #e0e0e0;
     margin-bottom: 20px;
-}
-
-.table .btn-link {
-    padding: 0;
-    margin: 0 5px; /* Small spacing between buttons */
-    font-size: 18px; /* Icon size */
-    border: none;
-    background: none;
-    cursor: pointer;
-}
-
-.table .btn-link i {
-    vertical-align: middle;
-}
-
-.table .btn-link.text-primary i {
-    color: #007bff; /* Bootstrap primary */
-}
-
-.table .btn-link.text-success i {
-    color: #28a745; /* Bootstrap success */
-}
-
-.table .btn-link.text-danger i {
-    color: #dc3545; /* Bootstrap danger */
-}
-
-.color-circle {
-    display: inline-block;
-    width: 10px; /* Dimensione del cerchio */
-    height: 10px;
-    border-radius: 50%; /* Rende l'elemento circolare */
-    margin-right: 4px; /* Spaziatura tra il cerchio e il testo */
-    vertical-align: middle; /* Allinea il cerchio con il testo */
-}
-
-.table tr.highlight-row {
-    background-color: #ffcccc !important;
-}
-
-.table .highlighted-row {
-    --bs-table-bg: #fff3cd !important; /* Forza il colore di sfondo */
-    --bs-table-color: #000 !important; /* Forza il colore del testo */
-    background-color: #fff3cd !important; /* Colore di sfondo giallo chiaro */
-    color: #000 !important; /* Colore del testo nero */
-    border: 2px solid red; /* Debug */
-    transition: background-color 0.3s ease; /* Transizione per evidenziazione */
 }
 
 /*NEW*/
