@@ -1,4 +1,4 @@
-﻿<li class="table-row d-flex {% if workday.highlighted %}highlighted-row{% endif %}">
+﻿<li class="table-row d-flex {% if workday.highlighted %}highlighted-row{% endif %}" id="row-{{ workday.id }}">
     <div class="col" data-label="Date">{{ workday.date.strftime('%d/%m/%Y') }}</div>
     <div class="col" data-label="Work ID">{{ workday.event.work_id }}</div>
     <div class="col" data-label="Work Name">{{ workday.event.name }}</div>
@@ -32,9 +32,14 @@
             </button>
         </form>
         <!-- Delete Button -->
-        <button type="button" class="btn btn-link text-danger delete-button" title="Erase"
-            data-workid="{{ workday.event.work_id }}" data-date="{{ workday.date.strftime('%d/%m/%Y') }}"
-            data-row-id="row-{{ workday.id }}" data-form-id="form-delete-{{ workday.id }}">
+        <button
+            type="button"
+            class="btn btn-link text-danger delete-button"
+            title="Erase"
+            data-workid="{{ workday.event.work_id }}"
+            data-date="{{ workday.date.strftime('%d/%m/%Y') }}"
+            data-row-id="row-{{ workday.id }}"
+            data-form-id="form-delete-{{ workday.id }}">
             <i class="fas fa-trash"></i>
         </button>
         <form id="form-delete-{{ workday.id }}" action="/delete_workday/{{ workday.id }}" method="POST" class="d-none"></form>
