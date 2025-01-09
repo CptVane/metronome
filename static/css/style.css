@@ -178,6 +178,7 @@ input:hover, select:hover {
 
 .table tr.highlight-row {
     background-color: #ffcccc !important;
+    color: #000 !important; /* Colore del testo nero */
 }
 
 .table .highlighted-row {
@@ -312,6 +313,11 @@ input:hover, select:hover {
     color: #000000 !important;
 }
 
+.responsive-table .table-row.highlight-row {
+    background-color: #ff5656 !important;
+    color: #000000 !important;
+}
+
 .responsive-table .col {
     padding: 5px 10px;
     text-align: left;
@@ -337,4 +343,25 @@ input:hover, select:hover {
         flex-basis: 50%;
         text-align: right;
     }
+}
+
+/* Default icon color */
+.table-row .col[data-label="Actions"] .btn i {
+    color: white !important; /* Default white color for icons */
+    transition: color 0.3s ease; /* Smooth transition for hover effect */
+}
+
+/* Hover effect for non-highlighted rows */
+.table-row .col[data-label="Actions"] .btn:hover i {
+    color: #ffc107 !important; /* Gold-like hover color for non-highlighted rows */
+}
+
+/* Highlighted row: Black icons */
+.responsive-table .table-row.highlighted-row .col[data-label="Actions"] .btn i {
+    color: #000000 !important; /* Icons turn black for highlighted rows */
+}
+
+/* Highlight row (e.g., red background): Black icons */
+.responsive-table .table-row.highlight-row .col[data-label="Actions"] .btn i {
+    color: #000000 !important; /* Icons turn black for highlight-row state */
 }

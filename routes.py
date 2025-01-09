@@ -1,4 +1,4 @@
-﻿from flask import Flask, render_template, request, redirect, url_for, Response, flash, jsonify
+﻿from flask import Flask, render_template, request, redirect, url_for, Response, flash, jsonify, session
 from sqlalchemy.orm import joinedload
 from models import db, Client, Event, Workday
 from helpers import calculate_work_time, calculate_total_fee
@@ -14,35 +14,32 @@ def create_routes(app):
 
     @app.route('/', methods=['GET'])
     def dashboard():
+        from datetime import datetime
+
         try:
-            # Logica della dashboard
-            from datetime import datetime
 
-            start_date = request.args.get('start_date')
-            end_date = request.args.get('end_date')
+            # Initialize session dates if not set
+            if 'start_date' not in session:
+                session['start_date'] = datetime(datetime.now().year, datetime.now().month, 1).strftime('%Y-%m-%d')
+            if 'end_date' not in session:
+                session['end_date'] = datetime.now().strftime('%Y-%m-%d')
 
-            if not start_date:
-                start_date = datetime(datetime.now().year, datetime.now().month, 1).date()
-            else:
-                start_date = datetime.strptime(start_date, '%Y-%m-%d').date()
+            # Get the date range from session
+            start_date = session['start_date']
+            end_date = session['end_date']
 
-            if not end_date:
-                end_date = datetime.now().date()
-            else:
-                end_date = datetime.strptime(end_date, '%Y-%m-%d').date()
-
-            # Esegui la query al database
+            # Query the database for workdays in the date range
             workdays = Workday.query.options(joinedload(Workday.event)).filter(
                 Workday.date >= start_date, Workday.date <= end_date
             ).order_by(Workday.date.asc()).all()
 
-            # Formatta il tempo lavorativo
+            # Format work_time for display
             for workday in workdays:
                 hours = int(workday.work_time)
                 minutes = int((workday.work_time - hours) * 60)
                 workday.formatted_work_time = f"{hours:02}:{minutes:02}"
 
-            # Ritorna la dashboard
+            # Render the dashboard
             return render_template(
                 'dashboard.html',
                 workdays=workdays,
@@ -52,9 +49,30 @@ def create_routes(app):
 
         except Exception as e:
             print(f"Error accessing dashboard: {e}")
-            # Redireziona alla pagina delle impostazioni in caso di errore
-            flash("Errore durante il caricamento della dashboard. Controlla le impostazioni.", "danger")
-            return redirect(url_for('settings'))
+            flash("Error loading dashboard. Defaulting to the current month.", "danger")
+            session['start_date'] = datetime(datetime.now().year, datetime.now().month, 1).strftime('%Y-%m-%d')
+            session['end_date'] = datetime.now().strftime('%Y-%m-%d')
+            return redirect(url_for('dashboard'))
+
+    @app.route('/update_date_range', methods=['POST'])
+    def update_date_range():
+        try:
+            data = request.get_json()
+            start_date = data.get('start_date')
+            end_date = data.get('end_date')
+
+            # Validate and update session
+            from datetime import datetime
+            datetime.strptime(start_date, '%Y-%m-%d')  # Validate format
+            datetime.strptime(end_date, '%Y-%m-%d')  # Validate format
+
+            session['start_date'] = start_date
+            session['end_date'] = end_date
+
+            return {"success": True}, 200
+        except Exception as e:
+            print(f"Error updating date range: {e}")
+            return {"success": False, "error": str(e)}, 400
 
     @app.route('/workday_row_template')
     def workday_row_template():
@@ -98,38 +116,59 @@ def create_routes(app):
         # Render edit form with current workday data
         return render_template('edit_workday.html', workday=workday)
 
-    @app.route('/duplicate_workday/<int:workday_id>', methods=['POST'])
-    def duplicate_workday(workday_id):
-        # Get the existing workday
-        workday = Workday.query.get_or_404(workday_id)
+    @app.route('/duplicate_workday/<int:id>', methods=['POST'])
+    def duplicate_workday(id):
+        try:
+            # Get the workday to duplicate
+            original_workday = Workday.query.get_or_404(id)
 
-        # Create a new workday with the same data
-        new_workday = Workday(
-            event_id=workday.event_id,
-            date=workday.date,
-            start_time=workday.start_time,
-            end_time=workday.end_time,
-            break_time=workday.break_time,
-            work_time=workday.work_time,
-            fee=workday.fee,
-            total_fee=workday.total_fee,
-        )
+            # Create a duplicate workday object
+            duplicate_workday = Workday(
+                date=original_workday.date,
+                start_time=original_workday.start_time,
+                end_time=original_workday.end_time,
+                break_time=original_workday.break_time,
+                work_time=original_workday.work_time,
+                fee=original_workday.fee,
+                total_fee=original_workday.total_fee,
+                use_overriden_fee=original_workday.use_overriden_fee,
+                override_fee=original_workday.override_fee,
+                highlighted=False,  # By default, the duplicate should not be highlighted
+                tags=original_workday.tags,
+                event_id=original_workday.event_id
+            )
 
-        # Add and commit the new workday
-        db.session.add(new_workday)
-        db.session.commit()
+            # Add the duplicate to the database
+            db.session.add(duplicate_workday)
+            db.session.commit()
 
+            flash("Workday duplicated successfully.", "success")
+        except Exception as e:
+            db.session.rollback()
+            flash(f"Error duplicating workday: {e}", "danger")
+
+        # Redirect back to the dashboard
         return redirect(url_for('dashboard'))
 
-    @app.route('/delete_workday/<int:workday_id>', methods=['POST'])
-    def delete_workday(workday_id):
-        workday = Workday.query.get(workday_id)
-        if not workday:
-            return "Workday not found", 404
+    @app.route('/delete_workday/<int:id>', methods=['POST'])
+    def delete_workday(id):
+        try:
+            # Get the date range from session
+            start_date = session.get('start_date')
+            end_date = session.get('end_date')
 
-        db.session.delete(workday)
-        db.session.commit()
-        return redirect('/')
+            # Fetch the workday to delete
+            workday = Workday.query.get_or_404(id)
+            db.session.delete(workday)
+            db.session.commit()
+
+            flash("Workday entry deleted successfully.", "success")
+        except Exception as e:
+            flash(f"Error deleting workday: {e}", "danger")
+            db.session.rollback()
+
+        # Redirect back to the dashboard with the same date range
+        return redirect(url_for('dashboard'))
 
     @app.route('/add_work', methods=['GET', 'POST'])
     def add_work():
@@ -229,16 +268,16 @@ def create_routes(app):
             db.session.rollback()
             return jsonify({"success": False, "message": str(e)})
 
-    @app.route('/edit_client/<int:client_id>', methods=['GET', 'POST'])
-    def edit_client(client_id):
-        client = Client.query.get_or_404(client_id)
-        if request.method == 'POST':
-            client.name = request.form['name']
-            client.color = request.form['color']
-            db.session.commit()
-            flash('Client updated successfully!', 'success')
-            return redirect(url_for('clients'))
-        return render_template('edit_client.html', client=client)
+    # @app.route('/edit_client/<int:client_id>', methods=['GET', 'POST'])
+    # def edit_client(client_id):
+    #     client = Client.query.get_or_404(client_id)
+    #     if request.method == 'POST':
+    #         client.name = request.form['name']
+    #         client.color = request.form['color']
+    #         db.session.commit()
+    #         flash('Client updated successfully!', 'success')
+    #         return redirect(url_for('clients'))
+    #     return render_template('edit_client.html', client=client)
 
     @app.route('/delete_client', methods=['DELETE'])
     def delete_client():
@@ -307,16 +346,20 @@ def create_routes(app):
         response.headers["Content-Disposition"] = f"attachment; filename={filename}"
         return response
 
-    @app.route('/toggle_highlight/<int:workday_id>', methods=['POST'])
-    def toggle_highlight(workday_id):
-        workday = Workday.query.get_or_404(workday_id)
+    @app.route('/toggle_highlight/<int:id>', methods=['POST'])
+    def toggle_highlight(id):
+        try:
+            workday = Workday.query.get_or_404(id)
 
-        # Cambia lo stato di evidenziazione
-        workday.highlighted = not workday.highlighted
-        db.session.commit()
+            # Toggle the highlighted value
+            workday.highlighted = not workday.highlighted
+            db.session.commit()
 
-        flash(f"{'Highlighted' if workday.highlighted else 'Unhighlighted'} workday {workday.id}.", "success")
-        return redirect(url_for('dashboard'))
+            return {"status": "success", "highlighted": workday.highlighted}, 200
+        except Exception as e:
+            db.session.rollback()
+            print(f"Error toggling highlight: {e}")
+            return {"status": "error", "message": str(e)}, 500
 
     @app.route('/settings', methods=['GET', 'POST'])
     def settings():
